@@ -1,0 +1,18 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Обработчик_заказов_BIKE18.RU.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="login_nethouse" Type="System.String" Scope="User">
+      <Value Profile="(Default)">bike18.ru</Value>
+    </Setting>
+    <Setting Name="pass_nethouse" Type="System.String" Scope="User">
+      <Value Profile="(Default)">B182016bike18ru</Value>
+    </Setting>
+    <Setting Name="login_pochta" Type="System.String" Scope="User">
+      <Value Profile="(Default)">moto@bike18.ru</Value>
+    </Setting>
+    <Setting Name="pass_pochta" Type="System.String" Scope="User">
+      <Value Profile="(Default)">B182016yandex</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
