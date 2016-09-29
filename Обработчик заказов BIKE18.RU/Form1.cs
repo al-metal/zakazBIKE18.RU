@@ -484,5 +484,82 @@ namespace Обработчик_заказов_BIKE18.RU
             }
 
         }
+
+        private void dataGridView1_CellContentDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if(e.ColumnIndex == 3)
+            {
+                int numberRow = e.RowIndex;
+                string number = dataGridView1.Rows[numberRow].Cells[0].Value.ToString();
+                StatusPrice(number);
+                richTextBox2.AppendText("Изменен статус оплаты заказа № " + number + "\n");
+            }
+        }
+
+        public void StatusPrice(string number)
+        {
+            string id_zakaza = sprav_id_zakazov[number];
+            HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://bike18.nethouse.ru/api/order/get/" + id_zakaza);
+            req.Accept = "application/json, text/plain, *";
+            req.UserAgent = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.93 Safari/537.36 OPR/32.0.1948.69";
+            req.CookieContainer = cookies;
+            req.ContentType = "application/x-www-form-urlencoded";
+
+            HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
+            StreamReader sr = new StreamReader(resp.GetResponseStream());
+            string otvet = Regex.Unescape(sr.ReadToEnd());
+
+            MatchCollection sovpad = new Regex("(?<=\"id\": ).*?(?=,)").Matches(otvet);
+            string id = sovpad[0].Value;
+
+            string deliveryType = new Regex("(?<=\"deliveryType\": \").*?(?=\")").Match(otvet).Value;
+
+
+            sovpad = new Regex("(?<=\"deliveryPrice\": ).*?(?=,)").Matches(otvet);
+            string deliveryPrice = sovpad[0].Value;
+
+            sovpad = new Regex("(?<=\"consumerId\": ).*?(?=,)").Matches(otvet);
+            string consumerId = sovpad[0].Value;
+
+            sovpad = new Regex("(?<=\"clientName\": \").*?(?=\",)").Matches(otvet);
+            string clientNAme = sovpad[0].Value;
+
+            sovpad = new Regex("(?<= \"clientPhone\": \").*?(?=\",)").Matches(otvet);
+            string clientPhone = sovpad[0].Value;
+
+            sovpad = new Regex("(?<=\"clientEmail\": ).*?(?=\",)").Matches(otvet);
+            string clientEmail = sovpad[0].Value;
+            if (clientEmail.Contains("\""))
+                clientEmail = clientEmail.Replace("\"", "");
+
+            string consumerInfo_adress = new Regex("(?<=\\{\"address\":\\{\"content\":\").*?(?=\",)").Match(otvet).Value;
+
+
+            string consumerInfo_koment = new Regex("(?<=\"comment\":\\{\"content\":\").*?(?=\")").Match(otvet).Value;
+
+            string status = new Regex("(?<=status\": \")[\\w\\W]*?(?=\")").Match(otvet).Value;
+
+
+            string consumerInfo_pasport = new Regex("(?<=\"field1\":\\{\"content\":\").*?(?=\")").Match(otvet).Value;
+
+
+
+            req = (HttpWebRequest)WebRequest.Create("http://bike18.nethouse.ru/api/order/save");
+            req.Accept = "application/json, text/plain, */*";
+            req.Method = "POST";
+            req.UserAgent = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.80 Safari/537.36 OPR/33.0.1990.58";
+            req.CookieContainer = cookies;
+            req.ContentType = "application/x-www-form-urlencoded";
+
+            byte[] bytes = Encoding.GetEncoding("utf-8").GetBytes("id=" + id + "&deliveryType=" + deliveryType + "&deliveryPrice=" + deliveryPrice + "&consumerId=" + consumerId + "&clientName=" + clientNAme + "&clientPhone=" + clientPhone + "&clientEmail=" + clientEmail + "&consumerInfo[address][content]=" + consumerInfo_adress + "&consumerInfo[address][label]=Адрес доставки" + "&consumerInfo[address][type]=0" + "&consumerInfo[comment][content]=" + consumerInfo_koment + "&consumerInfo[comment][label]=Комментарий (необязательное поле)" + "&consumerInfo[comment][type]=1" + "&consumerInfo[field1][content]=" + consumerInfo_pasport + "&consumerInfo[field1][label]=Паспортные данные (необязательное поле)" + "&consumerInfo[field1][type]=1" + "&status=" + status + "&isPaid=1&getCategories=1");
+            req.ContentLength = bytes.Length;
+            Stream s = req.GetRequestStream();
+            s.Write(bytes, 0, bytes.Length);
+            s.Close();
+
+            resp = (HttpWebResponse)req.GetResponse();
+
+
+        }
     }
 }
