@@ -539,6 +539,11 @@ namespace Обработчик_заказов_BIKE18.RU
 
             string status = new Regex("(?<=status\": \")[\\w\\W]*?(?=\")").Match(otvet).Value;
 
+            string isPaid = new Regex("(?<=isPaid\": )[\\w\\W]*?(?=,)").Match(otvet).Value;
+            if (isPaid == "1")
+                isPaid = "0";
+            else
+                isPaid = "1";
 
             string consumerInfo_pasport = new Regex("(?<=\"field1\":\\{\"content\":\").*?(?=\")").Match(otvet).Value;
 
