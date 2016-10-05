@@ -519,7 +519,6 @@ namespace Обработчик_заказов_BIKE18.RU
 
             string deliveryType = new Regex("(?<=\"deliveryType\": \").*?(?=\")").Match(otvet).Value;
 
-
             sovpad = new Regex("(?<=\"deliveryPrice\": ).*?(?=,)").Matches(otvet);
             string deliveryPrice = sovpad[0].Value;
 
