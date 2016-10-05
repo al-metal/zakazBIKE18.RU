@@ -492,6 +492,11 @@ namespace Обработчик_заказов_BIKE18.RU
                 int numberRow = e.RowIndex;
                 string number = dataGridView1.Rows[numberRow].Cells[0].Value.ToString();
                 StatusPrice(number);
+                string s = dataGridView1.Rows[numberRow].Cells[3].Value.ToString();
+                if (s == "1")
+                    dataGridView1.Rows[numberRow].Cells[3].Value = "0";
+                else
+                    dataGridView1.Rows[numberRow].Cells[3].Value = "1";
                 richTextBox2.AppendText("Изменен статус оплаты заказа № " + number + "\n");
             }
         }
@@ -527,13 +532,21 @@ namespace Обработчик_заказов_BIKE18.RU
             sovpad = new Regex("(?<= \"clientPhone\": \").*?(?=\",)").Matches(otvet);
             string clientPhone = sovpad[0].Value;
 
-            sovpad = new Regex("(?<=\"clientEmail\": ).*?(?=\",)").Matches(otvet);
-            string clientEmail = sovpad[0].Value;
-            if (clientEmail.Contains("\""))
-                clientEmail = clientEmail.Replace("\"", "");
+            sovpad = new Regex("(?<=clientEmail\": \").*(?=\",)").Matches(otvet);
+            string clientEmail = sovpad[0].Value;            
 
             string consumerInfo_adress = new Regex("(?<=\\{\"address\":\\{\"content\":\").*?(?=\",)").Match(otvet).Value;
 
+            MatchCollection consumerInfo = new Regex("(?<={\")[\\w\\W]*?(?=\"})").Matches(otvet);
+
+            string typeAdress = new Regex("(?<=type\":\").*?(?=\")").Match(consumerInfo[0].ToString()).ToString();
+            string ContentAdress = new Regex("(?<=content\":\").*?(?=\")").Match(consumerInfo[0].ToString()).ToString();
+
+            string typeKoment = new Regex("(?<=type\":\").*?(?=\")").Match(consumerInfo[1].ToString()).ToString();
+            string ContentKoment = new Regex("(?<=content\":\").*?(?=\")").Match(consumerInfo[1].ToString()).ToString();
+
+            string typePasport = new Regex("(?<=type\":\").*?(?=\")").Match(consumerInfo[2].ToString()).ToString();
+            string ContentPasport = new Regex("(?<=content\":\").*?(?=\")").Match(consumerInfo[2].ToString()).ToString();
 
             string consumerInfo_koment = new Regex("(?<=\"comment\":\\{\"content\":\").*?(?=\")").Match(otvet).Value;
 
@@ -545,10 +558,11 @@ namespace Обработчик_заказов_BIKE18.RU
             else
                 isPaid = "1";
 
-            string consumerInfo_pasport = new Regex("(?<=\"field1\":\\{\"content\":\").*?(?=\")").Match(otvet).Value;
-
-
-
+            string customTotal = new Regex("(?<=customTotal\":).*?(?=,)").Match(otvet).ToString();
+            if (customTotal == " null")
+                customTotal = "";
+            string paymentMethod = new Regex("(?<=paymentMethod\": \").*?(?=\")").Match(otvet).ToString();
+            
             req = (HttpWebRequest)WebRequest.Create("http://bike18.nethouse.ru/api/order/save");
             req.Accept = "application/json, text/plain, */*";
             req.Method = "POST";
@@ -556,7 +570,7 @@ namespace Обработчик_заказов_BIKE18.RU
             req.CookieContainer = cookies;
             req.ContentType = "application/x-www-form-urlencoded";
 
-            byte[] bytes = Encoding.GetEncoding("utf-8").GetBytes("id=" + id + "&deliveryType=" + deliveryType + "&deliveryPrice=" + deliveryPrice + "&consumerId=" + consumerId + "&clientName=" + clientNAme + "&clientPhone=" + clientPhone + "&clientEmail=" + clientEmail + "&consumerInfo[address][content]=" + consumerInfo_adress + "&consumerInfo[address][label]=Адрес доставки" + "&consumerInfo[address][type]=0" + "&consumerInfo[comment][content]=" + consumerInfo_koment + "&consumerInfo[comment][label]=Комментарий (необязательное поле)" + "&consumerInfo[comment][type]=1" + "&consumerInfo[field1][content]=" + consumerInfo_pasport + "&consumerInfo[field1][label]=Паспортные данные (необязательное поле)" + "&consumerInfo[field1][type]=1" + "&status=" + status + "&isPaid=1&getCategories=1");
+            byte[] bytes = Encoding.GetEncoding("utf-8").GetBytes("id=" + id + "&deliveryType=" + deliveryType + "&deliveryPrice=" + deliveryPrice + "&consumerId=" + consumerId + "&clientName=" + clientNAme + "&clientPhone=" + clientPhone + "&clientEmail=" + clientEmail + "&consumerInfo[0][type]=" + typeAdress + "&consumerInfo[0][content]=" + ContentAdress + "&consumerInfo[0][label]=%D0%90%D0%B4%D1%80%D0%B5%D1%81%20%D0%B4%D0%BE%D1%81%D1%82%D0%B0%D0%B2%D0%BA%D0%B8&consumerInfo[1][type]=" + typeKoment + "&consumerInfo[1][content]=" + ContentKoment + "&consumerInfo[1][label]=%D0%9A%D0%BE%D0%BC%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%80%D0%B8%D0%B9%20(%D0%BD%D0%B5%D0%BE%D0%B1%D1%8F%D0%B7%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D0%BE%D0%B5%20%D0%BF%D0%BE%D0%BB%D0%B5)&consumerInfo[2][type]=" + typePasport + "&consumerInfo[2][content]=" + ContentPasport + "&consumerInfo[2][label]=%D0%9F%D0%B0%D1%81%D0%BF%D0%BE%D1%80%D1%82%D0%BD%D1%8B%D0%B5%20%D0%B4%D0%B0%D0%BD%D0%BD%D1%8B%D0%B5%20(%D0%BD%D0%B5%D0%BE%D0%B1%D1%8F%D0%B7%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D0%BE%D0%B5%20%D0%BF%D0%BE%D0%BB%D0%B5)&status=" + status + "&isPaid=" + isPaid + "&customTotal=" + customTotal + "&paymentMethod=" + paymentMethod + "&getCategories=");
             req.ContentLength = bytes.Length;
             Stream s = req.GetRequestStream();
             s.Write(bytes, 0, bytes.Length);
