@@ -19,6 +19,7 @@ namespace Обработчик_заказов_BIKE18.RU
             w.Cells["C17"].Value = w.Cells["C16"].Value;
             w.Cells["B20"].Value = "Товар по Заказу №" + nomer_zakaza;
             w.Cells["H20"].Value = cena;
+            w.Cells["I20"].Value = cena;
             w.Cells["C12"].Value = nomer_zakaza;
             w.Cells["E12"].Value = DateTime.Now;
 
