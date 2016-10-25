@@ -208,17 +208,25 @@ namespace Обработчик_заказов_BIKE18.RU
                     sovpad = new Regex("(?<=clientEmail\": \").*?(?=\")").Matches(otvet);
                     string email = sovpad[0].Value;
 
-                string adres = new Regex("(?<=\"consumerInfo\": \\{\"address\":\\{\"content\":\").*?(?=\",)").Match(otvet).Value;
-                   
+                
+                sovpad = new Regex("(?<=\",\"content\":\").*?(?=\",\")").Matches(otvet);
 
-                string koment = new Regex("(?<=\"comment\":\\{\"content\":\").*?(?=\",)").Match(otvet).Value;
-                   
+                string adres = "";
+                    string koment = "";
+                    string pasport = "";
 
-                string pasport  = new Regex("(?<=\"field1\":\\{\"content\":\").*?(?=\",)").Match(otvet).Value;
-                   
+                if (sovpad.Count > 0)
+                    adres = sovpad[0].ToString();
+                
+                if(sovpad.Count > 1)
+                    koment = sovpad[1].ToString();
+
+                if (sovpad.Count > 2)
+                    pasport  = sovpad[1].ToString();
+                string isPaid = new Regex("(?<=\"isPaid\":).*?(?=,)").Match(otvet).ToString();
 
 
-                    sovpad = new Regex("(?<=\"totalItems\": ).*?(?=,)").Matches(otvet);
+                sovpad = new Regex("(?<=\"totalItems\": ).*?(?=,)").Matches(otvet);
                     string cena = sovpad[0].Value;
 
 
@@ -370,7 +378,7 @@ namespace Обработчик_заказов_BIKE18.RU
             string consumerId = sovpad[0].Value;
 
             sovpad = new Regex("(?<=\"clientName\": \").*?(?=\",)").Matches(otvet);
-            string clientNAme = sovpad[0].Value;
+            string clientNAme = sovpad[0].Value;  
 
             sovpad = new Regex("(?<= \"clientPhone\": \").*?(?=\",)").Matches(otvet);
             string clientPhone = sovpad[0].Value;
@@ -380,14 +388,24 @@ namespace Обработчик_заказов_BIKE18.RU
             if (clientEmail.Contains("\""))
                 clientEmail = clientEmail.Replace("\"", "");
 
-            string consumerInfo_adress = new Regex("(?<=\\{\"address\":\\{\"content\":\").*?(?=\",)").Match(otvet).Value;
+            string consumerInfo_adress = "";
           
-
-            string consumerInfo_koment = new Regex("(?<=\"comment\":\\{\"content\":\").*?(?=\")").Match(otvet).Value;
+            string consumerInfo_koment = "";
           
+            string consumerInfo_pasport = "";
 
-            string consumerInfo_pasport = new Regex("(?<=\"field1\":\\{\"content\":\").*?(?=\")").Match(otvet).Value;
-            
+            sovpad = new Regex("(?<=\",\"content\":\").*?(?=\",\")").Matches(otvet);
+
+            if (sovpad.Count > 0)
+                consumerInfo_adress = sovpad[0].ToString();
+
+            if (sovpad.Count > 1)
+                consumerInfo_koment = sovpad[1].ToString();
+
+            if (sovpad.Count > 2)
+                consumerInfo_pasport = sovpad[1].ToString();
+            string isPaid = new Regex("(?<=\"isPaid\":).*?(?=,)").Match(otvet).ToString();
+            string status = new Regex("(?<=status\": \").*?(?=\",)").Match(otvet).ToString();
 
 
             req = (HttpWebRequest)WebRequest.Create("http://bike18.nethouse.ru/api/order/save");
@@ -397,7 +415,8 @@ namespace Обработчик_заказов_BIKE18.RU
             req.CookieContainer = cookies;
             req.ContentType = "application/x-www-form-urlencoded";
 
-            byte[] bytes = Encoding.GetEncoding("utf-8").GetBytes("id=" + id + "&deliveryType=" + deliveryType + "&deliveryPrice=" + deliveryPrice + "&consumerId=" + consumerId + "&clientName=" + clientNAme + "&clientPhone=" + clientPhone + "&clientEmail=" + clientEmail + "&consumerInfo[address][content]=" + consumerInfo_adress + "&consumerInfo[address][label]=Адрес доставки" + "&consumerInfo[address][type]=0" + "&consumerInfo[comment][content]=" + consumerInfo_koment + "&consumerInfo[comment][label]=Комментарий (необязательное поле)" + "&consumerInfo[comment][type]=1" + "&consumerInfo[field1][content]=" + consumerInfo_pasport + "&consumerInfo[field1][label]=Паспортные данные (необязательное поле)" + "&consumerInfo[field1][type]=1" + "&status=active&isPaid=0&getCategories=1");
+            byte[] bytes = Encoding.GetEncoding("utf-8").GetBytes("id=" + id + "&deliveryType=" + deliveryType + "&deliveryPrice=" + deliveryPrice + "&consumerId=" + consumerId + "&clientName=" + clientNAme + "&clientPhone=" + clientPhone + "&clientEmail=" + clientEmail + "&consumerInfo[address][content]=" + consumerInfo_adress + "&consumerInfo[address][label]=Адрес доставки" + "&consumerInfo[address][type]=0" + "&consumerInfo[comment][content]=" + consumerInfo_koment + "&consumerInfo[comment][label]=Комментарий (необязательное поле)" + "&consumerInfo[comment][type]=1" + "&consumerInfo[field1][content]=" + consumerInfo_pasport + "&consumerInfo[field1][label]=Паспортные данные (необязательное поле)" + "&consumerInfo[field1][type]=1" + "&status=" + status + "&isPaid=" + isPaid + "&getCategories=1");
+
             req.ContentLength = bytes.Length;
             Stream s = req.GetRequestStream();
             s.Write(bytes, 0, bytes.Length);
