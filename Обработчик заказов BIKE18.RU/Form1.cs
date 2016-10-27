@@ -403,7 +403,7 @@ namespace Обработчик_заказов_BIKE18.RU
                 consumerInfo_koment = sovpad[1].ToString();
 
             if (sovpad.Count > 2)
-                consumerInfo_pasport = sovpad[1].ToString();
+                consumerInfo_pasport = sovpad[2].ToString();
             string isPaid = new Regex("(?<=\"isPaid\":).*?(?=,)").Match(otvet).ToString();
             string status = new Regex("(?<=status\": \").*?(?=\",)").Match(otvet).ToString();
 
