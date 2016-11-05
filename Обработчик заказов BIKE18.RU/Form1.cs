@@ -237,7 +237,7 @@ namespace Обработчик_заказов_BIKE18.RU
 
                     sovpad = new Regex("(?<=\"deliveryType\": \").*?(?=\")").Matches(otvet);
                     bool pochta;
-                    if (sovpad[0].Value == "Доставка почтой России от")
+                    if (sovpad[0].Value == "Почтой России")
                     {
                         pochta = true;
                     }
@@ -394,7 +394,7 @@ namespace Обработчик_заказов_BIKE18.RU
           
             string consumerInfo_pasport = "";
 
-            sovpad = new Regex("(?<=\",\"content\":\").*?(?=\",\")").Matches(otvet);
+            sovpad = new Regex("(?<=content\":\")[\\w\\W]*?(?=\",\"label)").Matches(otvet);
 
             if (sovpad.Count > 0)
                 consumerInfo_adress = sovpad[0].ToString();
@@ -410,12 +410,13 @@ namespace Обработчик_заказов_BIKE18.RU
 
             req = (HttpWebRequest)WebRequest.Create("http://bike18.nethouse.ru/api/order/save");
             req.Accept = "application/json, text/plain, */*";
+            req.Proxy = null;
             req.Method = "POST";
-            req.UserAgent = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.80 Safari/537.36 OPR/33.0.1990.58";
+            req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36";
             req.CookieContainer = cookies;
             req.ContentType = "application/x-www-form-urlencoded";
 
-            byte[] bytes = Encoding.GetEncoding("utf-8").GetBytes("id=" + id + "&deliveryType=" + deliveryType + "&deliveryPrice=" + deliveryPrice + "&consumerId=" + consumerId + "&clientName=" + clientNAme + "&clientPhone=" + clientPhone + "&clientEmail=" + clientEmail + "&consumerInfo[address][content]=" + consumerInfo_adress + "&consumerInfo[address][label]=Адрес доставки" + "&consumerInfo[address][type]=0" + "&consumerInfo[comment][content]=" + consumerInfo_koment + "&consumerInfo[comment][label]=Комментарий (необязательное поле)" + "&consumerInfo[comment][type]=1" + "&consumerInfo[field1][content]=" + consumerInfo_pasport + "&consumerInfo[field1][label]=Паспортные данные (необязательное поле)" + "&consumerInfo[field1][type]=1" + "&status=" + status + "&isPaid=" + isPaid + "&getCategories=1");
+            byte[] bytes = Encoding.GetEncoding("utf-8").GetBytes("id=" + id + "&deliveryType=" + deliveryType + "&deliveryPrice=" + deliveryPrice + "&consumerId=" + consumerId + "&clientName=" + clientNAme + "&clientPhone=" + clientPhone + "&clientEmail=" + clientEmail + "&consumerInfo[address][content]=" + consumerInfo_adress + "&consumerInfo[address][label]=Адрес доставки" + "&consumerInfo[address][type]=0" + "&consumerInfo[comment][content]=" + consumerInfo_koment + "&consumerInfo[comment][label]=Комментарий (необязательное поле)" + "&consumerInfo[comment][type]=1" + "&consumerInfo[field1][content]=" + consumerInfo_pasport + "&consumerInfo[field1][label]=Паспортные данные (необязательное поле)" + "&consumerInfo[field1][type]=1" + "&status=" + "active" + "&isPaid=" + isPaid + "&getCategories=");
 
             req.ContentLength = bytes.Length;
             Stream s = req.GetRequestStream();
