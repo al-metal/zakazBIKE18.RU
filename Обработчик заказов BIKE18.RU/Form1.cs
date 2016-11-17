@@ -79,7 +79,7 @@ namespace Обработчик_заказов_BIKE18.RU
                     StreamReader sr = new StreamReader(resp.GetResponseStream());
                     string otvet = sr.ReadToEnd();
                     otvet = Regex.Unescape(otvet);
-
+                resp.Close();
                     MatchCollection sovpad = new Regex("(?<=\"name\":\").*?(?=\")").Matches(otvet);
                     dataGridView1.Invoke(new Action(() =>
                     {
@@ -198,6 +198,7 @@ namespace Обработчик_заказов_BIKE18.RU
                     HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
                     StreamReader sr = new StreamReader(resp.GetResponseStream());
                     string otvet = Regex.Unescape(sr.ReadToEnd());
+                resp.Close();
 
                     MatchCollection sovpad = new Regex("(?<=clientName\": \").*?(?=\")").Matches(otvet);
                     string name = sovpad[0].Value;
@@ -363,6 +364,7 @@ namespace Обработчик_заказов_BIKE18.RU
             HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
             StreamReader sr = new StreamReader(resp.GetResponseStream());
             string otvet = Regex.Unescape(sr.ReadToEnd());
+            resp.Close();
 
 
             MatchCollection sovpad = new Regex("(?<=\"id\": ).*?(?=,)").Matches(otvet);
@@ -408,7 +410,7 @@ namespace Обработчик_заказов_BIKE18.RU
             string status = new Regex("(?<=status\": \").*?(?=\",)").Match(otvet).ToString();
 
 
-            req = (HttpWebRequest)WebRequest.Create("http://bike18.nethouse.ru/api/order/save");
+            req = (HttpWebRequest)WebRequest.Create("https://bike18.nethouse.ru/api/order/save");
             req.Accept = "application/json, text/plain, */*";
             req.Proxy = null;
             req.Method = "POST";
@@ -424,7 +426,7 @@ namespace Обработчик_заказов_BIKE18.RU
             s.Close();
 
             resp = (HttpWebResponse)req.GetResponse();
-
+            resp.Close();
             
         }
 
