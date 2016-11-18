@@ -484,14 +484,15 @@ namespace Обработчик_заказов_BIKE18.RU
         {
             Properties.Settings.Default.login_nethouse = textBox_login_nethouse.Text;
             Properties.Settings.Default.pass_nethouse = textBox_pass_nethouse.Text;
-            Properties.Settings.Default.login_pochta = textBox_pochta.Text ;
+            Properties.Settings.Default.login_pochta = textBox_pochta.Text;
             Properties.Settings.Default.pass_pochta = textBox_pass_pocha.Text;
             Properties.Settings.Default.Save();
 
             ServicePointManager.DefaultConnectionLimit = 100;
             cookies = Nethouseru.Signin();
+            CookieContainer cookiesYandex = Nethouseru.SigninYa();
             button2.Enabled = false;
-          
+
             if (cookies.Count != 1)
             {
                 Thread tabl = new Thread(() => Pars_zakazy());
@@ -502,9 +503,13 @@ namespace Обработчик_заказов_BIKE18.RU
             else
             {
                 MessageBox.Show("Неверный пароль!");
+                button2.Enabled = true;
 
             }
-
+            if (cookiesYandex.Count == 1)
+            {        MessageBox.Show("Неверный пароль!");
+            button2.Enabled = true;
+        }
         }
 
         private void dataGridView1_CellContentDoubleClick(object sender, DataGridViewCellEventArgs e)
