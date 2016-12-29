@@ -37,6 +37,10 @@ namespace Обработчик_заказов_BIKE18.RU
             textBox_pass_nethouse.Text = Properties.Settings.Default.pass_nethouse;
             textBox_pochta.Text = Properties.Settings.Default.login_pochta;
             textBox_pass_pocha.Text = Properties.Settings.Default.pass_pochta;
+            if (Properties.Settings.Default.kom_manager_text == "")
+                richTextBox_com_manager.Text = "Произведите оплату вашего заказа удобным для вас способом. Срок доставки 2-3 недели с момента оплаты.";
+            else
+                richTextBox_com_manager.Text = Properties.Settings.Default.kom_manager_text;
 
             ServicePointManager.DefaultConnectionLimit = 100;
             cookies = Nethouseru.Signin();
@@ -159,6 +163,7 @@ namespace Обработчик_заказов_BIKE18.RU
             Properties.Settings.Default.pass_nethouse = textBox_pass_nethouse.Text;
             Properties.Settings.Default.login_pochta = textBox_pochta.Text;
             Properties.Settings.Default.pass_pochta = textBox_pass_pocha.Text;
+            Properties.Settings.Default.kom_manager_text = richTextBox_com_manager.Text;
             Properties.Settings.Default.Save();
 
 
@@ -419,7 +424,7 @@ namespace Обработчик_заказов_BIKE18.RU
             req.ContentType = "application/x-www-form-urlencoded";
 
             byte[] bytes = Encoding.GetEncoding("utf-8").GetBytes("id=" + id + "&deliveryType=" + deliveryType + "&deliveryPrice=" + deliveryPrice + "&consumerId=" + consumerId + "&clientName=" + clientNAme + "&clientPhone=" + clientPhone + "&clientEmail=" + clientEmail + "&consumerInfo[address][content]=" + consumerInfo_adress + "&consumerInfo[address][label]=Адрес доставки" + "&consumerInfo[address][type]=0" + "&consumerInfo[comment][content]=" + consumerInfo_koment + "&consumerInfo[comment][label]=Комментарий (необязательное поле)" + "&consumerInfo[comment][type]=1" + "&consumerInfo[field1][content]=" + consumerInfo_pasport + "&consumerInfo[field1][label]=Паспортные данные (необязательное поле)" + "&consumerInfo[field1][type]=1" + "&status=" + "active" + "&isPaid=" + isPaid + "&getCategories=");
-
+                
             req.ContentLength = bytes.Length;
             Stream s = req.GetRequestStream();
             s.Write(bytes, 0, bytes.Length);

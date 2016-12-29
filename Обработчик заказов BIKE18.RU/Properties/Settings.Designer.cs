@@ -70,5 +70,17 @@ namespace Обработчик_заказов_BIKE18.RU.Properties {
                 this["pass_pochta"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string kom_manager_text {
+            get {
+                return ((string)(this["kom_manager_text"]));
+            }
+            set {
+                this["kom_manager_text"] = value;
+            }
+        }
     }
 }

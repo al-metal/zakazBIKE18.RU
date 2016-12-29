@@ -14,5 +14,8 @@
     <Setting Name="pass_pochta" Type="System.String" Scope="User">
       <Value Profile="(Default)">B182016yandex</Value>
     </Setting>
+    <Setting Name="kom_manager_text" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>
