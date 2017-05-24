@@ -13,7 +13,7 @@ namespace Обработчик_заказов_BIKE18.RU
         public CookieContainer Signin()
         {
             CookieContainer cookies = new CookieContainer();
-            HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://nethouse.ru/signin");
+            HttpWebRequest req = (HttpWebRequest)WebRequest.Create("https://nethouse.ru/signin");
             req.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8";
             req.UserAgent = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.93 Safari/537.36 OPR/32.0.1948.69";
             req.ContentType = "application/x-www-form-urlencoded";
