@@ -29,9 +29,9 @@ namespace Обработчик_заказов_BIKE18.RU
         }
 
 
-        
 
-        private  void Form1_Load(object sender, EventArgs e)
+
+        private void Form1_Load(object sender, EventArgs e)
         {
             textBox_login_nethouse.Text = Properties.Settings.Default.login_nethouse;
             textBox_pass_nethouse.Text = Properties.Settings.Default.pass_nethouse;
@@ -48,7 +48,7 @@ namespace Обработчик_заказов_BIKE18.RU
             for (int i = 0; i < 20; i++)
             {
                 dataGridView1.Rows.Add();
-                
+
             }
             if (cookies.Count != 1)
             {
@@ -64,93 +64,93 @@ namespace Обработчик_заказов_BIKE18.RU
 
             }
 
-            
+
         }
 
         public void Pars_zakazy()
         {
-            
+
             while (true)
             {
-                
-                    HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://bike18.nethouse.ru/api/order/get-orders?page=" + page + "&status=all");
-                    req.Accept = "application/json, text/plain, *";
-                    req.UserAgent = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.93 Safari/537.36 OPR/32.0.1948.69";
-                    req.CookieContainer = cookies;
-                    req.ContentType = "application/x-www-form-urlencoded";
 
-                    HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
-                    StreamReader sr = new StreamReader(resp.GetResponseStream());
-                    string otvet = sr.ReadToEnd();
-                    otvet = Regex.Unescape(otvet);
+                HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://bike18.nethouse.ru/api/order/get-orders?page=" + page + "&status=all");
+                req.Accept = "application/json, text/plain, *";
+                req.UserAgent = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.93 Safari/537.36 OPR/32.0.1948.69";
+                req.CookieContainer = cookies;
+                req.ContentType = "application/x-www-form-urlencoded";
+
+                HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
+                StreamReader sr = new StreamReader(resp.GetResponseStream());
+                string otvet = sr.ReadToEnd();
+                otvet = Regex.Unescape(otvet);
                 resp.Close();
-                    MatchCollection sovpad = new Regex("(?<=\"name\":\").*?(?=\")").Matches(otvet);
-                    dataGridView1.Invoke(new Action(() =>
+                MatchCollection sovpad = new Regex("(?<=\"name\":\").*?(?=\")").Matches(otvet);
+                dataGridView1.Invoke(new Action(() =>
+                {
+                    for (int i = 0; i < 20; i++)
                     {
-                        for (int i = 0; i <20; i++)
+                        dataGridView1.Rows[i].Cells[0].Value = sovpad[i].Value;
+                    }
+
+                    sovpad = new Regex("(?<=\"clientName\":\").*?(?=\")").Matches(otvet);
+
+                    for (int i = 0; i < sovpad.Count; i++)
+                    {
+                        dataGridView1.Rows[i].Cells[1].Value = sovpad[i].Value;
+                    }
+
+                    sovpad = new Regex("(?<=\"status\":\").*?(?=\")").Matches(otvet);
+
+                    for (int i = 0; i < sovpad.Count; i++)
+                    {
+                        dataGridView1.Rows[i].Cells[2].Value = sovpad[i].Value.Replace("active", "В обработке").Replace("canceled", "Отменен").Replace("delivery", "Доставка").Replace("new", "Новый").Replace("processed", "Выполнен").Replace("pickup", "Самовывоз");
+                        if (sovpad[i].Value == "new")
                         {
-                            dataGridView1.Rows[i].Cells[0].Value = sovpad[i].Value;
+                            dataGridView1.Rows[i].DefaultCellStyle.BackColor = Color.Yellow;
                         }
+                        else dataGridView1.Rows[i].DefaultCellStyle.BackColor = Color.White;
+                    }
 
-                        sovpad = new Regex("(?<=\"clientName\":\").*?(?=\")").Matches(otvet);
-
-                        for (int i = 0; i < sovpad.Count; i++)
-                        {
-                            dataGridView1.Rows[i].Cells[1].Value = sovpad[i].Value;
-                        }
-
-                        sovpad = new Regex("(?<=\"status\":\").*?(?=\")").Matches(otvet);
-
-                        for (int i = 0; i < sovpad.Count; i++)
-                        {
-                            dataGridView1.Rows[i].Cells[2].Value = sovpad[i].Value.Replace("active", "В обработке").Replace("canceled", "Отменен").Replace("delivery", "Доставка").Replace("new", "Новый").Replace("processed", "Выполнен").Replace("pickup", "Самовывоз");
-                            if (sovpad[i].Value == "new")
-                            {
-                                dataGridView1.Rows[i].DefaultCellStyle.BackColor = Color.Yellow;
-                            }
-                            else dataGridView1.Rows[i].DefaultCellStyle.BackColor = Color.White;
-                        }
-
-                        sovpad = new Regex("(?<=\"isPaid\":).*?(?=,)").Matches(otvet);
-                        for (int i = 0; i < sovpad.Count; i++)
-                        {
-                            dataGridView1.Rows[i].Cells[3].Style.Font = new System.Drawing.Font("Time new Romans", 16);
-                            dataGridView1.Rows[i].Cells[3].Value = sovpad[i].Value.Replace("true", "+").Replace("false", "-");
-                        }
+                    sovpad = new Regex("(?<=\"isPaid\":).*?(?=,)").Matches(otvet);
+                    for (int i = 0; i < sovpad.Count; i++)
+                    {
+                        dataGridView1.Rows[i].Cells[3].Style.Font = new System.Drawing.Font("Time new Romans", 16);
+                        dataGridView1.Rows[i].Cells[3].Value = sovpad[i].Value.Replace("true", "+").Replace("false", "-");
+                    }
 
 
-                        sovpad = new Regex("(?<=\"total\":).*?(?=,)").Matches(otvet);
+                    sovpad = new Regex("(?<=\"total\":).*?(?=,)").Matches(otvet);
 
-                        for (int i = 0; i < sovpad.Count; i++)
-                        {
-                            dataGridView1.Rows[i].Cells[4].Value = sovpad[i].Value;
-                        }
+                    for (int i = 0; i < sovpad.Count; i++)
+                    {
+                        dataGridView1.Rows[i].Cells[4].Value = sovpad[i].Value;
+                    }
 
-                        sovpad = new Regex("(?<=\"timestamp\":).*?(?=,)").Matches(otvet);
+                    sovpad = new Regex("(?<=\"timestamp\":).*?(?=,)").Matches(otvet);
 
-                        for (int i = 0; i < sovpad.Count; i++)
-                        {
-                            DateTime date = new DateTime(1970, 1, 1).AddSeconds(Convert.ToInt32(sovpad[i].Value));
-                            dataGridView1.Rows[i].Cells[5].Value = date.ToString().Substring(0, date.ToString().Length - 3);
-                        }
+                    for (int i = 0; i < sovpad.Count; i++)
+                    {
+                        DateTime date = new DateTime(1970, 1, 1).AddSeconds(Convert.ToInt32(sovpad[i].Value));
+                        dataGridView1.Rows[i].Cells[5].Value = date.ToString().Substring(0, date.ToString().Length - 3);
+                    }
 
-                        sovpad = new Regex("(?<=\"id\":).*?(?=,)").Matches(otvet);
-                        MatchCollection sovpad_dly_sprav = new Regex("(?<=\"name\":\").*?(?=\")").Matches(otvet);
-                        sprav_id_zakazov.Clear();
-                        for (int i = 0; i < sovpad.Count; i++)
-                        {
-                            sprav_id_zakazov.Add(sovpad_dly_sprav[i].Value, sovpad[i].Value);
-                        }
+                    sovpad = new Regex("(?<=\"id\":).*?(?=,)").Matches(otvet);
+                    MatchCollection sovpad_dly_sprav = new Regex("(?<=\"name\":\").*?(?=\")").Matches(otvet);
+                    sprav_id_zakazov.Clear();
+                    for (int i = 0; i < sovpad.Count; i++)
+                    {
+                        sprav_id_zakazov.Add(sovpad_dly_sprav[i].Value, sovpad[i].Value);
+                    }
 
-                    }));
-                    Thread.Sleep(5000);
-               
+                }));
+                Thread.Sleep(5000);
+
             }
-                
-            }
-            
-            
-        
+
+        }
+
+
+
 
         private void richTextBox1_TextChanged(object sender, EventArgs e)
         {
@@ -196,66 +196,66 @@ namespace Обработчик_заказов_BIKE18.RU
 
                 HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://bike18.nethouse.ru/api/order/get/" + id_zakaza);
                 req.Accept = "application/json, text/plain, *";
-                    req.UserAgent = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.93 Safari/537.36 OPR/32.0.1948.69";
-                    req.CookieContainer = cookies;
-                    req.ContentType = "application/x-www-form-urlencoded";
+                req.UserAgent = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.93 Safari/537.36 OPR/32.0.1948.69";
+                req.CookieContainer = cookies;
+                req.ContentType = "application/x-www-form-urlencoded";
 
-                    HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
-                    StreamReader sr = new StreamReader(resp.GetResponseStream());
-                    string otvet = Regex.Unescape(sr.ReadToEnd());
+                HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
+                StreamReader sr = new StreamReader(resp.GetResponseStream());
+                string otvet = Regex.Unescape(sr.ReadToEnd());
                 resp.Close();
 
-                    MatchCollection sovpad = new Regex("(?<=clientName\": \").*?(?=\")").Matches(otvet);
-                    string name = sovpad[0].Value;
+                MatchCollection sovpad = new Regex("(?<=clientName\": \").*?(?=\")").Matches(otvet);
+                string name = sovpad[0].Value;
 
-                    sovpad = new Regex("(?<=clientPhone\": \").*?(?=\")").Matches(otvet);
-                    string phone = sovpad[0].Value;
+                sovpad = new Regex("(?<=clientPhone\": \").*?(?=\")").Matches(otvet);
+                string phone = sovpad[0].Value;
 
-                    sovpad = new Regex("(?<=clientEmail\": \").*?(?=\")").Matches(otvet);
-                    string email = sovpad[0].Value;
+                sovpad = new Regex("(?<=clientEmail\": \").*?(?=\")").Matches(otvet);
+                string email = sovpad[0].Value;
 
-                
+
                 sovpad = new Regex("(?<=\",\"content\":\").*?(?=\",\")").Matches(otvet);
 
                 string adres = "";
-                    string koment = "";
-                    string pasport = "";
+                string koment = "";
+                string pasport = "";
 
                 if (sovpad.Count > 0)
                     adres = sovpad[0].ToString();
-                
-                if(sovpad.Count > 1)
+
+                if (sovpad.Count > 1)
                     koment = sovpad[1].ToString();
 
                 if (sovpad.Count > 2)
-                    pasport  = sovpad[1].ToString();
+                    pasport = sovpad[1].ToString();
                 string isPaid = new Regex("(?<=\"isPaid\":).*?(?=,)").Match(otvet).ToString();
 
 
                 sovpad = new Regex("(?<=\"totalItems\": ).*?(?=,)").Matches(otvet);
-                    string cena = sovpad[0].Value;
+                string cena = sovpad[0].Value;
 
 
-                    sovpad = new Regex("(?<=\"name\": \").*?(?=\")").Matches(otvet);
-                    string name_pozic = sovpad[1].Value;
+                sovpad = new Regex("(?<=\"name\": \").*?(?=\")").Matches(otvet);
+                string name_pozic = sovpad[1].Value;
 
 
 
-                    sovpad = new Regex("(?<=\"deliveryType\": \").*?(?=\")").Matches(otvet);
-                    bool pochta;
-                    if (sovpad[0].Value == "Почтой России")
-                    {
-                        pochta = true;
-                    }
-                    else
-                    {
-                        pochta = false;
-                    }
+                sovpad = new Regex("(?<=\"deliveryType\": \").*?(?=\")").Matches(otvet);
+                bool pochta;
+                if (sovpad[0].Value == "Почтой России")
+                {
+                    pochta = true;
+                }
+                else
+                {
+                    pochta = false;
+                }
 
                 textBox_price.Invoke(new Action(() => cena = textBox_price.Text));
                 excel.Zapis_shablona(adres, name, pasport, koment, email, phone, w, cena, pochta, radioButton1.Checked, name_pozic);
                 //Print(id_zakaza, email, w);
-          
+
                 string kom_manager = "";
                 string puthDogovor = "";
                 richTextBox_com_manager.Invoke(new Action(() => kom_manager = richTextBox_com_manager.Text));
@@ -275,11 +275,11 @@ namespace Обработчик_заказов_BIKE18.RU
 
             button1.Invoke(new Action(() => button1.Text = "Обработать выделенные заказы"));
             button1.Invoke(new Action(() => button1.Enabled = true));
-            list_select.Clear(); 
-            
+            list_select.Clear();
+
         }
 
-               
+
 
         //public Task<EventArgs> WaitForLoadingFramesComplete(IWebView wv)
         //{
@@ -302,25 +302,25 @@ namespace Обработчик_заказов_BIKE18.RU
 
         private void button2_Click(object sender, EventArgs e)
         {
-          
-           
-                page = (Convert.ToInt32(page)-1).ToString();
-                Delegate_table.Abort();
-                Thread tabl = new Thread(new ThreadStart(Pars_zakazy));
-                Delegate_table = tabl;
-                Delegate_table.IsBackground = true;
-                Delegate_table.Start();
-                label1.Text = "Страница " + page;
-                if (page == "1")
-                {
-                    button2.Invoke(new Action(() => button2.Enabled = false));
-                }
-            
+
+
+            page = (Convert.ToInt32(page) - 1).ToString();
+            Delegate_table.Abort();
+            Thread tabl = new Thread(new ThreadStart(Pars_zakazy));
+            Delegate_table = tabl;
+            Delegate_table.IsBackground = true;
+            Delegate_table.Start();
+            label1.Text = "Страница " + page;
+            if (page == "1")
+            {
+                button2.Invoke(new Action(() => button2.Enabled = false));
+            }
+
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
-          
+
             page = (Convert.ToInt32(page) + 1).ToString();
             Delegate_table.Abort();
             Thread tabl = new Thread(new ThreadStart(Pars_zakazy));
@@ -334,7 +334,7 @@ namespace Обработчик_заказов_BIKE18.RU
             label1.Text = "Страница " + page;
         }
 
-        
+
 
         private void groupBox3_Enter(object sender, EventArgs e)
         {
@@ -348,12 +348,12 @@ namespace Обработчик_заказов_BIKE18.RU
 
         private void label2_Click(object sender, EventArgs e)
         {
-            
+
         }
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            MessageBox.Show("Разработчик: Черницын Сергей\nDeveloped by Serkser\n\nДата: 04.11.2015");
+            MessageBox.Show("Разработчик: Черницын Сергей\nDeveloped by Serkser\nЗанимается поддержкой: al-metal\n\nДата: 04.11.2015");
         }
 
 
@@ -376,7 +376,7 @@ namespace Обработчик_заказов_BIKE18.RU
             string id = sovpad[0].Value;
 
             string deliveryType = new Regex("(?<=\"deliveryType\": \").*?(?=\")").Match(otvet).Value;
-            
+
 
             sovpad = new Regex("(?<=\"deliveryPrice\": ).*?(?=,)").Matches(otvet);
             string deliveryPrice = sovpad[0].Value;
@@ -385,7 +385,7 @@ namespace Обработчик_заказов_BIKE18.RU
             string consumerId = sovpad[0].Value;
 
             sovpad = new Regex("(?<=\"clientName\": \").*?(?=\",)").Matches(otvet);
-            string clientNAme = sovpad[0].Value;  
+            string clientNAme = sovpad[0].Value;
 
             sovpad = new Regex("(?<= \"clientPhone\": \").*?(?=\",)").Matches(otvet);
             string clientPhone = sovpad[0].Value;
@@ -396,9 +396,9 @@ namespace Обработчик_заказов_BIKE18.RU
                 clientEmail = clientEmail.Replace("\"", "");
 
             string consumerInfo_adress = "";
-          
+
             string consumerInfo_koment = "";
-          
+
             string consumerInfo_pasport = "";
 
             sovpad = new Regex("(?<=content\":\")[\\w\\W]*?(?=\",\"label)").Matches(otvet);
@@ -424,7 +424,7 @@ namespace Обработчик_заказов_BIKE18.RU
             req.ContentType = "application/x-www-form-urlencoded";
 
             byte[] bytes = Encoding.GetEncoding("utf-8").GetBytes("id=" + id + "&deliveryType=" + deliveryType + "&deliveryPrice=" + deliveryPrice + "&consumerId=" + consumerId + "&clientName=" + clientNAme + "&clientPhone=" + clientPhone + "&clientEmail=" + clientEmail + "&consumerInfo[address][content]=" + consumerInfo_adress + "&consumerInfo[address][label]=Адрес доставки" + "&consumerInfo[address][type]=0" + "&consumerInfo[comment][content]=" + consumerInfo_koment + "&consumerInfo[comment][label]=Комментарий (необязательное поле)" + "&consumerInfo[comment][type]=1" + "&consumerInfo[field1][content]=" + consumerInfo_pasport + "&consumerInfo[field1][label]=Паспортные данные (необязательное поле)" + "&consumerInfo[field1][type]=1" + "&status=" + "active" + "&isPaid=" + isPaid + "&getCategories=");
-                
+
             req.ContentLength = bytes.Length;
             Stream s = req.GetRequestStream();
             s.Write(bytes, 0, bytes.Length);
@@ -432,7 +432,7 @@ namespace Обработчик_заказов_BIKE18.RU
 
             resp = (HttpWebResponse)req.GetResponse();
             resp.Close();
-            
+
         }
 
 
@@ -441,7 +441,7 @@ namespace Обработчик_заказов_BIKE18.RU
             if (dataGridView1.SelectedCells[0].ColumnIndex == 0 && (string)dataGridView1.SelectedCells[0].Value != null)
             {
                 string id_ = sprav_id_zakazov[(string)dataGridView1.SelectedCells[0].Value];
-                HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://bike18.nethouse.ru/api/order/get/"+ id_);
+                HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://bike18.nethouse.ru/api/order/get/" + id_);
                 req.Accept = "application/json, text/plain, */*";
                 req.UserAgent = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36 OPR/34.0.2036.50";
                 req.CookieContainer = cookies;
@@ -449,7 +449,7 @@ namespace Обработчик_заказов_BIKE18.RU
 
                 HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
                 StreamReader sr = new StreamReader(resp.GetResponseStream());
-                string otvet =sr.ReadToEnd();
+                string otvet = sr.ReadToEnd();
 
                 string price = new Regex("(?<=\"totalItems\": ).*?(?=,)").Match(otvet).Value.Split('.')[0];
                 textBox_price.Text = price;
@@ -512,14 +512,15 @@ namespace Обработчик_заказов_BIKE18.RU
 
             }
             if (cookiesYandex.Count == 1)
-            {        MessageBox.Show("Неверный пароль!");
-            button2.Enabled = true;
-        }
+            {
+                MessageBox.Show("Неверный пароль!");
+                button2.Enabled = true;
+            }
         }
 
         private void dataGridView1_CellContentDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            if(e.ColumnIndex == 3)
+            if (e.ColumnIndex == 3)
             {
                 int numberRow = e.RowIndex;
                 string number = dataGridView1.Rows[numberRow].Cells[0].Value.ToString();
@@ -564,7 +565,7 @@ namespace Обработчик_заказов_BIKE18.RU
             string clientPhone = sovpad[0].Value;
 
             sovpad = new Regex("(?<=clientEmail\": \").*(?=\",)").Matches(otvet);
-            string clientEmail = sovpad[0].Value;            
+            string clientEmail = sovpad[0].Value;
 
             string consumerInfo_adress = new Regex("(?<=\\{\"address\":\\{\"content\":\").*?(?=\",)").Match(otvet).Value;
 
@@ -593,8 +594,8 @@ namespace Обработчик_заказов_BIKE18.RU
             if (customTotal == " null")
                 customTotal = "";
             string paymentMethod = new Regex("(?<=paymentMethod\": \").*?(?=\")").Match(otvet).ToString();
-            
-            req = (HttpWebRequest)WebRequest.Create("http://bike18.nethouse.ru/api/order/save");
+
+            req = (HttpWebRequest)WebRequest.Create("https://bike18.nethouse.ru/api/order/save");
             req.Accept = "application/json, text/plain, */*";
             req.Method = "POST";
             req.UserAgent = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.80 Safari/537.36 OPR/33.0.1990.58";
